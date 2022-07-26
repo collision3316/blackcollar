@@ -1,0 +1,7 @@
+﻿Create Android Apps Without Android
+
+I installed Android Studio Arctic Fox on my Kali Linux machine. Excited, I went ahead and hit build and run on the Hello World example only to be shot down by some "Gradle sync error". I scoured the Internet for solutions but none worked for me...or maybe I did them wrong. So I finally gave up on Android Studio's slick interface with all those handy tools like the visual layout editor (sobs) and decided I was going to go on this Android journey the old fashioned way. Want to try it? Well....
+
+First you'll need to download the Android SDK (Software Development Kit) <a href="https://developer.android.com/sdk/index.html" target="_blank">here</a>. Scroll down to where it says "Command line tools only" and click on the package for your specific operating system. After that there'll be this long list of terms and conditions but noone ever reads those (Lulz) so scroll down and just agree.
+Is it done? Wow. You must have light speed internet!
+Go ahead and extract the file
