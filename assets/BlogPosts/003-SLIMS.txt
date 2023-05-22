@@ -1,0 +1,37 @@
+The Challenge
+
+It was a friend of mine who sent me the above advertisement. A Laboratory Information Management System. What could be more boring, I thought. And this came right when I was about to start a project I had been planning for some time. I couldn't possibly drop that for this little thing now could I? Well...a thousand dollar prize begged to differ!
+
+I thought on the problem for a day. The next day I had decided that this was going to be a web application written with PHP on the backend and using HTML 5, Bootstrap 4, and W3CSS on the frontend. These decisions were made because then I was unfamiliar with other technologies such as ReactJS and NextJS. I also coded from scratch because I've never liked using content management systems such as Wordpress because I find them limiting to my creative process. For the database I used MySQL or MariaDB to be exact. My development and also planned deployment server was the LAMPP stack since this was going to be an internal app that would not have to handle much of a load. I justify the web app route by saying the future is on the web. Web apps are cross platform which worked for me because I didn't know on what kind of system this application was going to be run. I guess I could have used a Docker container but at the ti,e I had no idea what containerization was.
+The first code I wrote was for the dashboard. It was basically a bunch of Bootstrap cards, a header and a footer. I thought I had done my best with it. My friend then told me that I was actually supposed to build a fully functional app! And here I was thinking a demo page was going to be enough. I deleted the page and started over.
+
+It was time to do some real work. I busted out my pen and notepad and began sketching a data flow diagram (DFD) of the proposed system. Then I drew a site map of which pages linked to where. I also wrote down all the tables I'd need for the database and their structures. This was the hardest part as I had no idea what kind of data was collected for samples in a mining laboratory. Google was my best friend and helped me find the answers I needed. Soon enough I had the tables all laid out. I tackle most problems in a top-down fashion. With this one I started with the login page. This was challenging as my knowledge of PHP relating to MySQL was limited. It took over an hour to get this part working. Then came the dashboard once more. I decided I would keep the basic layout of my first attempt then make it more slick and also use the Zimbabwe School of Mines colors and put the school name in the header.
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
+
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="res/w3.css">
+    <link rel="stylesheet" type="text/css" href="res/style.css">
+    <link rel="stylesheet" type="text/css" href="res/bootstrap-4.3.1-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="res/fontawesome-free-6.1.1-web/css/all.css">
+    <link rel="icon" href="res/img/favicon.ico">
+</head>
+    <nav class="w3-mobile w3-bar text-center w3-top w3-bar" style="background-color:#9b1d20; color: goldenrod;">
+        <h5 class="w3-bar" style="color: white; background-color: goldenrod; font-weight: bold;">Zimbabwe School of Mines</h5>
+        <p>Laboratory Information Management System</p>
+        <span class="w3-right" style="padding-right: 10px;">LOGGED IN AS:<span class="w3-red"><?php echo htmlspecialchars($_SESSION["username"]); ?></span></span>
+    </nav>
+
+</html>
+
+I sent the application to my friend at ZSM. It was a hassle getting him and his friend to install it on their box. They finally managed to do it. There was a lecturer the said was helping them out. He would point out things that needed to be changed and things that needed to be added. I'd get angry because the guy was telling me to add things that he himself did not know how to do. Most of the changes had m redesigning most of my code jut to accommodate those additions. Then I had the brilliant idea of just making the changes on the frontend. For example, the search function of the application did not query the database directly. It instead used Javascript to search the table already displayed on the page. This made the searching instantaneous. Then I had to add another complex feature (complex to me), user accounts with different privileges. I googled around but found nothing I could grasp so I decided to hack up a quick solution. I changed my login code to check the first three characters of the user name entered then change which page would be displayed based on that three-character prefix. I then duplicated the app and modified the information and functions available based on the user's access level defined by the prefix. This posed a security issue because if someone figured out how the application was determining access level they would just register a new account with the necessary prefix. To work around this risk I made it so such that only an admin could add new users to the application database. This way the only point of failure would be if an admin account was compromised. 
+
+My creation was finally showcased to the relevant people at Zimbabwe School of Mines and they found it impressive. Apparently I was the only entry that had a working system. The rest were models. They even told my friend to go and get a process flowchart from the lab technician so that I could incorporate that into the application. At this point I thought, "What can one do with a thousand US dollars?". I worked tirelessly to make perfect the app. When I finished I felt this was a winner for sure. Then everything went dark. Apparently the relevant people were no longer responding and no one got back to my friend about the application or the competition. It just died down. All that time working on the application only to be slapped in the face with disappointment. I started to remove all the ZSM colors and branding I had put in the app and changed it all to Skytech Digital. I used my knowledge in the cybersecurity field to secure the app as best I could. Then I archived one of my greatest creations and forgot about it. 
+

@@ -72,108 +72,99 @@
 	    <article class="blog-post px-3 py-5 p-md-5">
 		    <div class="container">
 			    <header class="blog-post-header">
-				    <h2 class="title mb-2">Hello, World!</h2>
-				    <div class="meta mb-3"><span class="date">Published 11 July 2022</span><span class="time">5 min read</span><span class="comment"><a href="#">0 comments</a></span></div>
+				    <h2 class="title mb-2">Hacking Into A Box via FTP(Metasploitable2)</h2>
+				    <div class="meta mb-3"><span class="date">Published 03 May 2023</span><span class="time">5 min read</span><span class="comment"><a href="#">0 comments</a></span></div>
 			    </header>
 			    
 			    <div class="blog-post-body">
 				    <figure class="blog-banner">
-				        <a href="https://skytechdigital.github.io/"><img class="img-fluid" src="assets/images/blog/blog-post-banner.jpg" alt="image"></a>
-				        <figcaption class="mt-2 text-center image-caption">Image Credit: <a href="https://skytechdigital.github.io/?ref=devblog" target="_blank">made4dev.com (Premium Programming T-shirts)</a></figcaption>
+				        <a href="https://skytechdigital.github.io/"><img class="img-fluid" src="assets/images/blog/kali1.png" alt="image"></a>
+				        <figcaption class="mt-2 text-center image-caption">Image Credit: <a href="https://skytechdigital.github.io/" target="_blank">Kali Linux Wallpapers</a></figcaption>
 				    </figure>
-				    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. </p>
+				    <p>The machine I’m using for this lab is running Kali 2023.1. The Metasploitable 2 VM is running in Oracle VirtualBox v7.0.6. The VM is on a bridged adapter so its accessible from anywhere on my WLAN. 
+
+						To start, we use arp-scan to determine the IP address of the target (the Metasploitable VM).</p>
+				    <pre>
+						<code>
+sudo arp-scan -l
+						</code>
+					</pre>
+					<img class="img-fluid" src="assets/images/blog/1.png" alt="arp scan results">
 				    
-				    <h3 class="mt-5 mb-3">Code Block Example</h3>
-				    <p>You can get more info at <a href="https://highlightjs.org/" target="_blank">https://highlightjs.org/</a>. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. </p>
+				    <p>The target machine 192.168.43.212. Next we want to discover if there are any open ports on the target and if so what services are runniong on those ports. For that we do an nmap scan with -sC for default scripts, -sV for enumerate versions, -oA for output all formats, and the path we want to write the output to:</p>
 				    <pre>
 					    <code>
-function $initHighlight(block, cls) {
-  try {
-    if (cls.search(/\bno\-highlight\b/) != -1)
-      return process(block, true, 0x0F) +
-             ` class="${cls}"`;
-  } catch (e) {
-    /* handle exception */
-  }
-  for (var i = 0 / 2; i < classes.length; i++) {
-    if (checkCondition(classes[i]) === undefined)
-      console.log('undefined');
-  }
-}
-
-export  $initHighlight;
+nmap -sC -sV -oA nmap/metasploitable2 192.168.43.212
 					    </code>
 				    </pre>
-				    <h3 class="mt-5 mb-3">Typography</h3>
-				    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
-				    <h5 class="my-3">Bullet Points:</h5>
-				    <ul class="mb-5">
-					  <li class="mb-2">Lorem ipsum dolor sit amet consectetuer.</li>
-					  <li class="mb-2">Aenean commodo ligula eget dolor.</li>
-					  <li class="mb-2">Aenean massa cum sociis natoque penatibus.</li>
-					</ul>
-					<ol class="mb-5">
-					  <li class="mb-2">Lorem ipsum dolor sit amet consectetuer.</li>
-					  <li class="mb-2">Aenean commodo ligula eget dolor.</li>
-					  <li class="mb-2">Aenean massa cum sociis natoque penatibus.</li>
-					</ol>
-					<h5 class="my-3">Quote Example:</h5>
+					<img class="img-fluid" src="assets/images/blog/2.png" alt="nmap scan results">
+
+				    <p>The full output files can be found <a href="https://github.com/collision3316/">here</a>. We’re are going to go through the ports in the order they appear in the scan starting with port 21, FTP. As we can see in the screenshot, anonymous FTP login is allowed by this server. This allows us to login with a username of ‘anonymous’ and an empty password. Lets go ahead an try it:</p>
+				    <pre>
+						<code>
+ftp  192.168.43.212
+						</code>
+					</pre>
+					<img class="img-fluid" src="assets/images/blog/3.png" alt="ftp anonymous login">
+					
+					<p>Looks like the ftp server is empty. The ftp version is vsftpd 2.3.4. Let’s see if there are any known vulnerabilities. This step is essential because it saves us from going out and developing exploits that already exist. Using Searchsploit we get the following results:
+					</p>
+					<pre>
+						<code>
+searchsploit  vsftpd
+						</code>
+					</pre>
+					<img class="img-fluid" src="assets/images/blog/4.png" alt="searchsploit results">
+
+					<p>There are two exploits for the version of vsftpd we have. These are located in /usr/share/exploitdb/exploits/unix. There are many routes to take to deliver th exploit but we are going to use the Metasploit Framework. The module name in Metasploit is exploit/unix/ftp/vsftpd_234_backdoor. First fire up Metasploit with the command msfdb run. Onc its up we do the following:</p>
+					<pre>
+						<code>
+use exploit/unix/ftp/vsftpd_234_backdoor
+						</code>
+					</pre>
+					<p>Once the prompt has the module name appended to is in red then we can see what information the attack requires by entering:</p>
+					<pre>
+						<code>
+show options
+						</code>
+					</pre>
+					<img class="img-fluid" src="assets/images/blog/5.png" alt="msf show options">
+					<p>There is a requirement for RHOSTS, which is the IP addresses of the target. In this case we only have one target so we enter:</p>
+					<pre>
+						<code>
+set RHOSTS 192.168.43.212
+						</code>
+					</pre>
+					<p>With that we enter the run or exploit command to fire off our exploit:</p>
+					<pre>
+						<code>
+exploit
+						</code>
+					</pre>
+					<img class="img-fluid" src="assets/images/blog/6.png" alt="exploit">
+					<p>Now we have a backdoor session on the target machine. Entering ls shows us all the directories in the current directory which appears to be /.  Entering whoami show us that we are logged in a root. Congratulations on rooting the box!!!
+						In a real life hack, its not enough to just root the box. The goal is usually to cause destruction but most often to steal information. Fore example, now that we have root access we can go ahead and view the shadow file:</p>
+
+						<pre>
+							<code>
+cat etc/shadow
+							</code>
+						</pre>
+					<img class="img-fluid" src="assets/images/blog/7.png" alt="shadow file">
+					<p>Now we can grab the hashes and crack them using a password cracker of our choice. Tools to use here are <strong>unshadow</strong> and <strong>John</strong> among others.</p>
+
+
 					<blockquote class="blockquote m-lg-5 py-3 pl-4 px-lg-5">
-						<p class="mb-2">You might not think that programmers are artists, but programming is an extremely creative profession. It's logic-based creativity.</p>
-						<footer class="blockquote-footer">John Romero</footer>
+						<p class="mb-2">“What hackers do is figure out technology and experiment with it in ways many people never imagined. They also have a strong desire to share this information with others and to explain it to people whose only qualification may be the desire to learn.”</p>
+						<footer class="blockquote-footer">Emmanuel Goldstein</footer>
 					</blockquote>
 					
-					<h5 class="my-3">Table Example:</h5>
-					<table class="table table-striped my-5">
-						<thead>
-							<tr>
-								<th scope="col">#</th>
-								<th scope="col">First</th>
-								<th scope="col">Last</th>
-								<th scope="col">Handle</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<th scope="row">1</th>
-								<td>Mark</td>
-								<td>Otto</td>
-								<td>@mdo</td>
-							</tr>
-							<tr>
-								<th scope="row">2</th>
-								<td>Jacob</td>
-								<td>Thornton</td>
-								<td>@fat</td>
-							</tr>
-							<tr>
-								<th scope="row">3</th>
-								<td>Larry</td>
-								<td>the Bird</td>
-								<td>@twitter</td>
-							</tr>
-						</tbody>
-					</table>
 					
-					<h5 class="mb-3">Embed A Tweet:</h5>
-					
-					<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">1969:<br>-what&#39;re you doing with that 2KB of RAM?<br>-sending people to the moon<br><br>2017:<br>-what&#39;re you doing with that 1.5GB of RAM?<br>-running Slack</p>&mdash; I Am Devloper (@iamdevloper) <a href="https://twitter.com/iamdevloper/status/926458505355235328?ref_src=twsrc%5Etfw">November 3, 2017</a></blockquote>
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
-				    
-				    <h3 class="mt-5 mb-3">Video Example</h3>
-				    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. </p>
-
-				    <div class="embed-responsive embed-responsive-16by9">
-					   <iframe width="560" height="315" src="https://www.youtube.com/embed/hnCmSXCZEpU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>					
-					</div>
-				   
 			    </div>
 				    
 			    <nav class="blog-nav nav nav-justified my-5">
-				  <a class="nav-link-prev nav-item nav-link rounded-left" href="index.html">Previous<i class="arrow-prev fas fa-long-arrow-alt-left"></i></a>
-				  <a class="nav-link-next nav-item nav-link rounded-right" href="blog-list.html">Next<i class="arrow-next fas fa-long-arrow-alt-right"></i></a>
+				  <a class="nav-link-prev nav-item nav-link rounded-left" href="003-Slims.html">Previous<i class="arrow-prev fas fa-long-arrow-alt-left"></i></a>
+				  <a class="nav-link-next nav-item nav-link rounded-right" href="index.html">Next<i class="arrow-next fas fa-long-arrow-alt-right"></i></a>
 				</nav>
 				
 				<div class="blog-comments-section">
@@ -220,10 +211,10 @@ export  $initHighlight;
 	    
 	    <section class="promo-section theme-bg-light py-5 text-center">
 		    <div class="container">
-			    <h2 class="title">Promo Section Heading</h2>
-			    <p>You can use this section to promote your side projects etc. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. </p>
+			    <h2 class="title">IT and Cybersecurity Consultation</h2>
+			    <p>Skytech Digital offers affordable ICT and Cybersecurity consultation services at affordable pries for small businesses and individuals. Contact us via WhatsApp at <a href="https://wa.me/263786173865" class="btn btn-warning">+263 786 173 865 </a> or email <a href="mailto:skytechdigital116@gmail.com" class="btn btn-warning">skytechdigital116@gmail.com</a></p>
                 <figure class="promo-figure">
-			        <a href="https://skytechdigital.github.io/" target="_blank"><img class="img-fluid" src="assets/images/promo-banner.jpg" alt="image"></a>
+			        <a href="https://wa.me/263786173865?text=I'm%20interested%20in%20Scarlet%20Dinnerware" target="_blank"><img class="img-fluid" src="assets/images/ads/skytech/engineer.jpg" alt="image"></a>
 			    </figure>
 		    </div><!--//container-->
 	    </section><!--//promo-section-->
@@ -244,7 +235,6 @@ export  $initHighlight;
     <script src="assets/plugins/popper.min.js"></script> 
     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script> 
     
-    <!-- Page Specific JS -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js"></script>
 
     <!-- Custom JS -->
