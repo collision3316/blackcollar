@@ -35,7 +35,7 @@
 				<div class="profile-section pt-3 pt-lg-0">
 				    <img class="profile-image mb-3 rounded-circle mx-auto" src="assets/images/profile.jpg" alt="image" >			
 					
-					<div class="bio mb-3">There's no place like<br>31 32 37 2e 30 2e 30 2e 31  <br><a href="https://skytechdigital.github.io/" class="btn btn-primary">PING</a></div><!--//bio-->
+					<div class="bio mb-3">There's no place like<br>0x7f.00.00.1  <br><a href="https://skytechdigital.github.io/" class="btn btn-primary">PING</a></div><!--//bio-->
 					<ul class="social-list list-inline py-3 mx-auto">
 			            <li class="list-inline-item"><a href="#"><i class="fab fa-twitter fa-fw"></i></a></li>
 			            <li class="list-inline-item"><a href="#"><i class="fab fa-linkedin-in fa-fw"></i></a></li>
@@ -51,7 +51,10 @@
 					    <a class="nav-link" href="index.html"><i class="fas fa-home fa-fw mr-2"></i>Home <span class="sr-only">(current)</span></a>
 					</li>
 					<li class="nav-item">
-					    <a class="nav-link" href="004-Metasploitable2FTP.html"><i class="fas fa-bookmark fa-fw mr-2"></i>Latest Post</a>
+					    <a class="nav-link" href="005-Metasploitable2CMDexec.html"><i class="fas fa-bookmark fa-fw mr-2"></i>Latest Post</a>
+					</li>
+					<li class="nav-item">
+					    <a class="nav-link" href="blog-list.html"><i class="fas fa-bookmark fa-fw mr-2"></i>Older Posts</a>
 					</li>
 					<li class="nav-item">
 					    <a class="nav-link" href="about.html"><i class="fas fa-user fa-fw mr-2"></i>About Me</a>
@@ -117,8 +120,19 @@
 					    <div class="media-body">
 						    <h3 class="title mb-1"><a href="004-Metasploitable2FTP.html">Hacking Into A Box via FTP(Metasploitable2)</a></h3>
 						    <div class="meta mb-1"><span class="date">Published 03 May 2023</span><span class="time">5 min read</span></div>
-						    <div class="intro">Man-In-The-Middle (MITM) attacks involve capturing the target's data while it is en route to the intended receipient or between any relays between the target and the receipient. In this tutorial I'll demonstarte how to perform....</div>
+						    <div class="intro">The target machine is 192.168.43.212. Next we want to discover if there are any open ports on the target and if so what services are runniong on those ports. For that we do an nmap scan with -sC for default scripts, -sV for enumerate versions,....</div>
 						    <a class="more-link" href="004-Metasploitable2FTP.html">Read more &rarr;</a>
+					    </div><!--//media-body-->
+				    </div><!--//media-->
+			    </div><!--//item-->
+				<div class="item mb-5">
+				    <div class="media">
+					    <img class="mr-3 img-fluid post-thumb d-none d-md-flex" src="assets/images/blog/challenge.png" alt="image">
+					    <div class="media-body">
+						    <h3 class="title mb-1"><a href="005-Metasploitable2CMDexec.html">Exploiting Command Execution To Steal User Credentials(Metasploitable2)</a></h3>
+						    <div class="meta mb-1"><span class="date">Published 15 July 2023</span><span class="time">5 min read</span></div>
+						    <div class="intro">In this one, we are going to leverage a command execution vulnerability in a web application to gain an initial foothold on the system and then perform local enumeration on the target machine after to find the vulnerability we need to access....</div>
+						    <a class="more-link" href="005-Metasploitable2CMDexec.html">Read more &rarr;</a>
 					    </div><!--//media-body-->
 				    </div><!--//media-->
 			    </div><!--//item-->
